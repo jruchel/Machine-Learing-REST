@@ -14,13 +14,13 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin
-public class HelloController extends Controller {
+public class MLScriptController extends Controller {
 
     @Autowired
     private PythonService pythonService;
 
-    @SecuredMapping(path = "/hello", method = RequestMethod.GET)
-    public String hello(@PathParam("script") String script) {
+    @SecuredMapping(path = "/script", method = RequestMethod.GET)
+    public String runScript(@PathParam("script") String script) {
         try {
             return pythonService.runScript(script);
         } catch (IOException e) {
