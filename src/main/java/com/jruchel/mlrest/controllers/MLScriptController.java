@@ -2,7 +2,7 @@ package com.jruchel.mlrest.controllers;
 
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
-import com.jruchel.mlrest.services.http.PythonBackendService;
+import com.jruchel.mlrest.services.PythonBackendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMethod;

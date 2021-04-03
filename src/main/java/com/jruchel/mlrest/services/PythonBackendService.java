@@ -1,4 +1,4 @@
-package com.jruchel.mlrest.services.http;
+package com.jruchel.mlrest.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
