@@ -12,7 +12,7 @@ public class PythonBackendService {
     private HttpService httpService;
 
     public String getHelloResponse() throws IOException {
-        return httpService.get("https://api.punkapi.com", "/v2/beers");
+        return httpService.get("http://localhost:5000", "/hello");
     }
 
 }
