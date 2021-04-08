@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import com.jruchel.mlrest.models.User;
+import io.jsonwebtoken.SignatureException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.function.Function;
 public class JWTUtils {
     private static final String SECRET = "alpejskiemleczkoosmakuwaniliowym";
 
-    public static String extractUsername(String token) {
+    public static String extractUsername(String token) throws SignatureException {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -29,12 +30,12 @@ public class JWTUtils {
         return extractExpiration(token).before(new Date());
     }
 
-    public static <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public static <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws SignatureException {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    private static Claims extractAllClaims(String token) {
+    private static Claims extractAllClaims(String token) throws SignatureException {
         return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
     }
 

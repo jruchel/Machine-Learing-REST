@@ -1,8 +1,8 @@
 package com.jruchel.mlrest.security.fillters;
 
-import lombok.RequiredArgsConstructor;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -24,7 +24,12 @@ public class JwtFillter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("token");
         if (token != null && !token.isEmpty()) {
-            String username = JWTUtils.extractUsername(token);
+            String username = "";
+            try {
+                username = JWTUtils.extractUsername(token);
+            } catch (Exception ex) {
+                return;
+            }
             if (username != null && !username.isEmpty()) {
                 User user = userService.loadUserByUsername(username);
                 if (user != null && JWTUtils.validateToken(token, user)) {

@@ -41,17 +41,17 @@ public class SecurityController extends Controller {
         }
     }
 
-    @SecuredMapping(path = "/principal", method = RequestMethod.GET)
+    @SecuredMapping(path = "/principal", method = RequestMethod.GET, role = "user")
     public Principal principal(Principal principal) {
         return principal;
     }
 
-    @SecuredMapping(path = "/roles", method = RequestMethod.GET)
+    @SecuredMapping(path = "/roles", method = RequestMethod.GET, role = "user")
     public List<Role> getRoles() {
         return securityService.getAllRoles();
     }
 
-    @SecuredMapping(path = "/users", method = RequestMethod.GET)
+    @SecuredMapping(path = "/users", method = RequestMethod.GET, role = "user")
     public List<User> getUsers() {
         return securityService.getAllUsers();
     }
