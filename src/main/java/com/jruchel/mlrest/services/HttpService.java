@@ -1,5 +1,6 @@
 package com.jruchel.mlrest.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,10 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class HttpService {
 
-    @Autowired
-    private RestTemplate requests;
+    private final RestTemplate requests;
 
     public String get(String address, String endpoint, Map<String, String> pathParams, MultipartFile file) throws IOException, URISyntaxException {
         URL url = constructUrl(address, endpoint, pathParams);

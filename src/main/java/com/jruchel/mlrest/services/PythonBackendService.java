@@ -3,7 +3,7 @@ package com.jruchel.mlrest.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.config.Properties;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,16 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class PythonBackendService {
 
-    @Autowired
-    private HttpService httpService;
-
-    @Autowired
-    private Properties properties;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final HttpService httpService;
+    private final Properties properties;
+    private final ObjectMapper objectMapper;
 
     public List<String> getAlgorithms() {
         try {
