@@ -28,9 +28,24 @@ public class MLScriptController extends Controller {
     }
 
     @SecuredMapping(path = "/algorithms/linear-regression", method = RequestMethod.GET)
-    public String getHello(@RequestBody MultipartFile csv, @PathParam("separator") String separator, @PathParam("predicting") String predicting) {
+    public String linearRegression(@RequestBody MultipartFile csv, @PathParam("separator") String separator, @PathParam("predicting") String predicting) {
         try {
             return backendService.linearRegression(csv, separator, predicting);
+        } catch (IOException | URISyntaxException e) {
+            return e.getMessage();
+        }
+    }
+
+    @SecuredMapping(path = "/algorithms/k-nearest-neighbours", method = RequestMethod.GET)
+    public String knn
+            (
+                    @RequestBody MultipartFile csv,
+                    @PathParam("separator") String separator,
+                    @PathParam("predicting") String predicting,
+                    @PathParam("neighbours") int neighbours
+            ) {
+        try {
+            return backendService.knn(csv, separator, predicting, neighbours);
         } catch (IOException | URISyntaxException e) {
             return e.getMessage();
         }
