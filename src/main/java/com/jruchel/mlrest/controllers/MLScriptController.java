@@ -4,8 +4,10 @@ import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.PythonBackendService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
@@ -20,11 +22,6 @@ public class MLScriptController extends Controller {
 
     private final PythonBackendService backendService;
 
-    @Autowired
-    public MLScriptController(PythonBackendService backendService) {
-        this.backendService = backendService;
-    }
-
     @SecuredMapping(path = "/algorithms", method = RequestMethod.GET)
     public List<String> getAlgorithms() {
         return backendService.getAlgorithms();
@@ -38,5 +35,4 @@ public class MLScriptController extends Controller {
             return e.getMessage();
         }
     }
-
 }
