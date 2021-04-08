@@ -20,7 +20,6 @@ public class Model {
     private int id;
     private String name;
     @Lob
-    @Type(type = "org.hibernate.type.BlobType")
     private byte[] savedModel;
 
     @JsonIgnore

@@ -32,18 +32,20 @@ public class PythonBackendService {
         }
     }
 
-    public String knn(MultipartFile csvData, String separator, String predicting, int neighbours) throws IOException, URISyntaxException {
+    public String knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save) throws IOException, URISyntaxException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
         params.put("neighbours", String.valueOf(neighbours));
+        params.put("save", String.valueOf(save));
         return algorithm("k-nearest-neighbours", csvData, params);
     }
 
-    public String linearRegression(MultipartFile csvData, String separator, String predicting) throws IOException, URISyntaxException {
+    public String linearRegression(MultipartFile csvData, String separator, String predicting, boolean save) throws IOException, URISyntaxException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
+        params.put("save", String.valueOf(save));
         return algorithm("linear-regression", csvData, params);
     }
 
