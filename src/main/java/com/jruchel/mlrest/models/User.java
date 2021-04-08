@@ -25,29 +25,47 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
     private boolean locked;
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    private Set<Model> models;
 
     public User() {
         this.roles = new HashSet<>();
+        this.models = new HashSet<>();
     }
 
     public void setRoles(Set<Role> roles) {
+        this.roles = new HashSet<>();
         for (Role r : roles) {
-            r.addUser(this);
+            if (r != null) this.roles.add(r);
         }
     }
 
+    public void setModels(Set<Model> models) {
+        this.models = new HashSet<>();
+        for (Model m : models) {
+            if (m != null) this.models.add(m);
+        }
+    }
+
+    public void addModel(Model model) {
+        if (model == null) return;
+        this.models.add(model);
+    }
+
     public void grantRole(Role role) {
+        if (role == null) return;
         this.roles.add(role);
         role.addUser(this);
     }
 
     public void revokeRole(Role role) {
+        if (role == null) return;
         this.roles.removeIf(r -> r.getTitle().equals(role.getTitle()));
     }
 

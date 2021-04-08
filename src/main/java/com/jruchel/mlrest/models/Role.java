@@ -24,7 +24,7 @@ public class Role implements GrantedAuthority {
     @Column(name = "title")
     private String title;
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "roles", cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<User> users;
 
     public Role() {

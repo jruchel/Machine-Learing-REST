@@ -1,14 +1,15 @@
 package com.jruchel.mlrest.services;
 
 
-import lombok.RequiredArgsConstructor;
 import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.repositories.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +26,14 @@ public class UserService implements UserDetailsService {
         if (checkEntityIntegrity(user)) {
             userRepository.save(user);
         }
+    }
+
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        for (User user : userRepository.findAll()) {
+            users.add(user);
+        }
+        return users;
     }
 
     private boolean checkEntityIntegrity(User user) throws EntityIntegrityException {
@@ -45,7 +54,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public User loadUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 }

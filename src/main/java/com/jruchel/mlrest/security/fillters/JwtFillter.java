@@ -22,11 +22,11 @@ public class JwtFillter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("auth");
+        String token = request.getHeader("token");
         if (token != null && !token.isEmpty()) {
             String username = JWTUtils.extractUsername(token);
             if (username != null && !username.isEmpty()) {
-                User user = (User) userService.loadUserByUsername(username);
+                User user = userService.loadUserByUsername(username);
                 if (user != null && JWTUtils.validateToken(token, user)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
