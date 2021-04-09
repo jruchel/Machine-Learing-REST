@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -24,6 +25,7 @@ public class User implements UserDetails {
     private String username;
     @Column(name = "password")
     private String password;
+    private UUID secret;
     private boolean locked;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
@@ -37,6 +39,7 @@ public class User implements UserDetails {
     public User() {
         this.roles = new HashSet<>();
         this.models = new HashSet<>();
+        secret = UUID.randomUUID();
     }
 
     public void setRoles(Set<Role> roles) {
@@ -56,6 +59,7 @@ public class User implements UserDetails {
     public void addModel(Model model) {
         if (model == null) return;
         this.models.add(model);
+        model.setOwner(this);
     }
 
     public void grantRole(Role role) {
