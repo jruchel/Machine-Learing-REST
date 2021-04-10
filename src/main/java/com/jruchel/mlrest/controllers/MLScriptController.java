@@ -63,6 +63,8 @@ public class MLScriptController extends Controller {
                     Model model = new Model();
                     model.setName(savename);
                     model.setSavedModel(decoded);
+                    model.setLastTrainedAccuracy(Double.parseDouble(node.get("accuracy").toString()));
+                    model.setPredictedAttribute(predicting);
                     user.addModel(model);
                     modelService.save(model);
                     if (modelService.findByUserAndName(user, savename) != null) {

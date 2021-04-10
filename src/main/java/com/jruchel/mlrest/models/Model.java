@@ -19,6 +19,8 @@ public class Model {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
+    private String predictedAttribute;
+    private double lastTrainedAccuracy;
     @Lob
     private byte[] savedModel;
 
