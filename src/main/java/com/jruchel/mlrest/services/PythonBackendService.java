@@ -2,9 +2,11 @@ package com.jruchel.mlrest.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jruchel.mlrest.componets.HttpService;
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@EnableConfigurationProperties(Properties.class)
 public class PythonBackendService {
 
     private final HttpService httpService;
@@ -34,9 +37,8 @@ public class PythonBackendService {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
-        params.put("modelfile", Arrays.toString(model.getSavedModel()));
 
-        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s/predict", "linear-regression"), params, data);
+        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s/predict", "linear-regression"), params, data, model.getSavedModel());
     }
 
     public String knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException, URISyntaxException {
@@ -61,7 +63,7 @@ public class PythonBackendService {
     }
 
     public String algorithm(String algorithm, MultipartFile csvData, Map<String, String> params) throws IOException, URISyntaxException {
-        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s", algorithm), params, csvData);
+        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s", algorithm), params, csvData, null);
     }
 
 }

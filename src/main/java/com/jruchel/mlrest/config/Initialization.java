@@ -2,9 +2,9 @@ package com.jruchel.mlrest.config;
 
 import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
-import com.jruchel.mlrest.services.EntityIntegrityException;
+import com.jruchel.mlrest.exceptions.EntityIntegrityException;
 import com.jruchel.mlrest.services.RoleService;
-import com.jruchel.mlrest.services.SecurityService;
+import com.jruchel.mlrest.security.SecurityService;
 import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

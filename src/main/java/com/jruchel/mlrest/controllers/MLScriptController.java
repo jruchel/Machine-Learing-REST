@@ -1,15 +1,17 @@
 package com.jruchel.mlrest.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
+import com.jruchel.mlrest.models.dto.MLModel;
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.ModelService;
 import com.jruchel.mlrest.services.PythonBackendService;
 import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +38,7 @@ public class MLScriptController extends Controller {
         return backendService.getAlgorithms();
     }
 
-    @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.GET, role = "user")
+    @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.GET)
     public String predictLinearRegression(Principal principal,
                                           @PathParam(value = "modelName") String modelName,
                                           @RequestBody MultipartFile data,
@@ -51,10 +53,10 @@ public class MLScriptController extends Controller {
         }
     }
 
-    @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET, role = "user")
+    @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
     public String linearRegression
             (
-                    Principal principal,
+//                    Principal principal,
                     @RequestBody MultipartFile csv,
                     @PathParam("separator") String separator,
                     @PathParam("predicting") String predicting,
@@ -63,23 +65,26 @@ public class MLScriptController extends Controller {
 
             ) {
         try {
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            authentication.getPrincipal();
             boolean saveResult = false;
-            User user = userService.loadUserByUsername(principal.getName());
+            User user = userService.loadUserByUsername("kuba");
             UUID userSecret = user.getSecret();
             String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
             if (save) {
-                ObjectNode node = objectMapper.readValue(response, ObjectNode.class);
-                if (node.has("file")) {
-                    String encoded = node.get("file").toString();
-                    encoded = omitFirstAndLastCharacter(encoded);
-                    byte[] decoded = encoded.getBytes();
+                MLModel mlModel = objectMapper.readValue(response, MLModel.class);
+                if (mlModel.getFile() != null) {
+
+                    String encoded = mlModel.getFile();
+                    encoded = encoded.replace("b'", "").replace("'", "");
                     Model model = new Model();
                     model.setName(savename);
-                    model.setSavedModel(decoded);
-                    model.setLastTrainedAccuracy(Double.parseDouble(node.get("accuracy").toString()));
+                    model.setSavedModel(encoded);
+                    model.setLastTrainedAccuracy(Double.parseDouble(String.valueOf(mlModel.getAccuracy())));
                     model.setPredictedAttribute(predicting);
-                    user.addModel(model);
-                    modelService.save(model);
+                    Model savedModel = modelService.save(model);
+                    user.addModel(savedModel);
                     if (modelService.findByUserAndName(user, savename) != null) {
                         saveResult = true;
                     }
@@ -92,15 +97,7 @@ public class MLScriptController extends Controller {
         }
     }
 
-    private String omitFirstAndLastCharacter(String string) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 1; i < string.length() - 1; i++) {
-            sb.append(string.charAt(i));
-        }
-        return sb.toString();
-    }
-
-    @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET, role = "user")
+    @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
     public String knn
             (Principal principal,
              @RequestBody MultipartFile csv,

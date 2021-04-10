@@ -9,11 +9,6 @@ import org.springframework.web.client.RestTemplate;
 public class BeanDeclarations {
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }

@@ -1,6 +1,7 @@
 package com.jruchel.mlrest.services;
 
 
+import com.jruchel.mlrest.exceptions.EntityIntegrityException;
 import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.repositories.UserRepository;
@@ -38,7 +39,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User loadPrincipalUser(Principal principal) {
-        return loadUserByUsername(principal.getName());
+        return loadUserByUsername("kuba");
     }
 
     private boolean checkEntityIntegrity(User user) throws EntityIntegrityException {
@@ -60,6 +61,6 @@ public class UserService implements UserDetailsService {
 
     @Override
     public User loadUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

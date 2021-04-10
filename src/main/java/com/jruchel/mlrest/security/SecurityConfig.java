@@ -18,7 +18,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig extends MySecurityConfig {
     private final JwtFillter jwtFillter;
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -34,8 +34,13 @@ public class SecurityConfig extends MySecurityConfig {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         setupEndpoints(http).authorizeRequests()
-                .anyRequest().authenticated().and()
-                .csrf().disable().cors().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .anyRequest().authenticated()
+                .and()
+                .csrf().disable()
+                .cors()
+                .and()
+                .sessionManagement().
+                sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtFillter, UsernamePasswordAuthenticationFilter.class);
     }
 

@@ -1,12 +1,12 @@
-package com.jruchel.mlrest.controllers;
+package com.jruchel.mlrest.controllers.security;
 
 import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.security.fillters.JWTUtils;
-import com.jruchel.mlrest.services.EntityIntegrityException;
-import com.jruchel.mlrest.services.SecurityService;
+import com.jruchel.mlrest.exceptions.EntityIntegrityException;
+import com.jruchel.mlrest.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

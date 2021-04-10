@@ -20,7 +20,7 @@ public class ModelRepositoryController extends Controller {
     private final ModelService modelService;
     private final UserService userService;
 
-    @SecuredMapping(path = "", method = RequestMethod.GET, role = "user")
+    @SecuredMapping(path = "", method = RequestMethod.GET)
     public Model getModelFile(Principal principal, @PathParam(value = "name") String name) {
         return modelService.findByUserAndName(userService.loadPrincipalUser(principal), name);
     }

@@ -14,15 +14,18 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Model {
+
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(unique = true)
     private String name;
     private String predictedAttribute;
     private double lastTrainedAccuracy;
     @Lob
-    private byte[] savedModel;
+    private String savedModel;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)

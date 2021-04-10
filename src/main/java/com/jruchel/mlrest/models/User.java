@@ -21,9 +21,9 @@ import java.util.UUID;
 public class User implements UserDetails {
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-    @Column(name = "username")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "username", unique = true)
     private String username;
     @Column(name = "password")
     private String password;

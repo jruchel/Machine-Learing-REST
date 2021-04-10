@@ -1,6 +1,9 @@
-package com.jruchel.mlrest.services;
+package com.jruchel.mlrest.security;
 
 import com.jruchel.mlrest.models.Role;
+import com.jruchel.mlrest.exceptions.EntityIntegrityException;
+import com.jruchel.mlrest.services.RoleService;
+import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
 import com.jruchel.mlrest.models.User;
 import org.springframework.security.core.userdetails.UserDetails;
