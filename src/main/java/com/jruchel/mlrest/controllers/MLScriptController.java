@@ -10,14 +10,12 @@ import com.jruchel.mlrest.services.ModelService;
 import com.jruchel.mlrest.services.PythonBackendService;
 import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +34,21 @@ public class MLScriptController extends Controller {
     @SecuredMapping(path = "", method = RequestMethod.GET)
     public List<String> getAlgorithms() {
         return backendService.getAlgorithms();
+    }
+
+    @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.GET, role = "user")
+    public String predictLinearRegression(Principal principal,
+                                          @PathParam(value = "modelName") String modelName,
+                                          @RequestBody MultipartFile data,
+                                          @PathParam(value = "separator") String separator,
+                                          @PathParam(value = "predicting") String predicting
+    ) {
+        Model model = modelService.findByUserAndName(userService.loadPrincipalUser(principal), modelName);
+        try {
+            return backendService.predictLinearRegression(model, data, separator, predicting);
+        } catch (IOException | URISyntaxException e) {
+            return e.toString();
+        }
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET, role = "user")

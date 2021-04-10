@@ -3,16 +3,14 @@ package com.jruchel.mlrest.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.config.Properties;
+import com.jruchel.mlrest.models.Model;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +28,15 @@ public class PythonBackendService {
         } catch (IOException | URISyntaxException e) {
             return new ArrayList<>();
         }
+    }
+
+    public String predictLinearRegression(Model model, MultipartFile data, String separator, String predicting) throws IOException, URISyntaxException {
+        Map<String, String> params = new HashMap<>();
+        params.put("separator", separator);
+        params.put("predicting", predicting);
+        params.put("modelfile", Arrays.toString(model.getSavedModel()));
+
+        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s/predict", "linear-regression"), params, data);
     }
 
     public String knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException, URISyntaxException {
