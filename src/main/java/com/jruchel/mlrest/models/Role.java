@@ -17,6 +17,7 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 public class Role implements GrantedAuthority {
+    @JsonIgnore
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)

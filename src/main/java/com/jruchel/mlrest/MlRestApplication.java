@@ -12,4 +12,3 @@ public class MlrestApplication {
 
 }
 
-//TODO make principal work with JWT

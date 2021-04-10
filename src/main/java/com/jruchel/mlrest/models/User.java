@@ -1,5 +1,6 @@
 package com.jruchel.mlrest.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,13 +19,16 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 public class User implements UserDetails {
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @Column(name = "username")
     private String username;
+    @JsonIgnore
     @Column(name = "password")
     private String password;
+    @JsonIgnore
     private UUID secret;
     private boolean locked;
     @ManyToMany(fetch = FetchType.EAGER)
