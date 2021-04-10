@@ -58,8 +58,8 @@ public class MLScriptController extends Controller {
                 ObjectNode node = objectMapper.readValue(response, ObjectNode.class);
                 if (node.has("file")) {
                     String encoded = node.get("file").toString();
-                    encoded = encoded.replaceAll("\"", "");
-                    byte[] decoded = Base64Utils.decode(encoded.getBytes(StandardCharsets.UTF_8));
+                    encoded = omitFirstAndLastCharacter(encoded);
+                    byte[] decoded = encoded.getBytes();
                     Model model = new Model();
                     model.setName(savename);
                     model.setSavedModel(decoded);
@@ -68,13 +68,21 @@ public class MLScriptController extends Controller {
                     if (modelService.findByUserAndName(user, savename) != null) {
                         saveResult = true;
                     }
-                    response = response.replaceAll(String.format("\"%s\":\"%s\"", "file", encoded), String.format("saved:%s", saveResult));
+                    response = response.replaceAll("\\\"file\\\":.+\\\".+\\\",", String.format("\"saved\":%s,", saveResult));
                 }
             }
             return response;
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    private String omitFirstAndLastCharacter(String string) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i < string.length() - 1; i++) {
+            sb.append(string.charAt(i));
+        }
+        return sb.toString();
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET, role = "user")

@@ -22,7 +22,6 @@ public class Model {
     private byte[] savedModel;
 
     @JsonIgnore
-    @JoinTable(name = "user_id")
     @ManyToOne(fetch = FetchType.EAGER)
     private User owner;
 }
