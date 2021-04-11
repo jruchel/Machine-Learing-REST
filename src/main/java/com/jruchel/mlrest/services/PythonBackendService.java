@@ -1,7 +1,5 @@
 package com.jruchel.mlrest.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
@@ -14,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +20,10 @@ public class PythonBackendService {
 
     private final HttpService httpService;
     private final Properties properties;
-    private final ObjectMapper objectMapper;
 
     public List<String> getAlgorithms() {
-        try {
-            String json = httpService.get(properties.getBackendAddress(), "/algorithms");
-            return objectMapper.readValue(json, new TypeReference<List<String>>() {
-            });
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
+        List<Object> list = httpService.get(properties.getBackendAddress(), "/algorithms", ArrayList.class).getBody();
+        return list.stream().map(o -> o.toString()).collect(Collectors.toList());
     }
 
     public String predictLinearRegression(Model model, MultipartFile data, String separator, String predicting) throws IOException {

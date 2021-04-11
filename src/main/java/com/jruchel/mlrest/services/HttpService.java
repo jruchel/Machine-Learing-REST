@@ -20,10 +20,10 @@ public class HttpService {
 
     private final RestTemplate requests;
 
-    public String get(String address, String endpoint, Map<String, String> headers, Map<String, String> pathParams) {
+    public <T> ResponseEntity<T> get(String address, String endpoint, Map<String, String> headers, Map<String, String> pathParams, Class<T> c) {
         String url = constructUrl(address, endpoint, pathParams);
         HttpEntity<String> requestEntity = new HttpEntity<>(toHeaders(headers));
-        return requests.exchange(url, HttpMethod.GET, requestEntity, String.class).getBody();
+        return requests.exchange(url, HttpMethod.GET, requestEntity, c);
     }
 
     public <T> ResponseEntity<T> postMultipartForm(String address, String endpoint, Map<String, Object> formData, Map<String, String> headersMap, Map<String, String> params, Class<T> c) throws IOException {
@@ -62,8 +62,8 @@ public class HttpService {
         return body;
     }
 
-    public String get(String address, String endpoint) {
-        return get(address, endpoint, new HashMap<>(), new HashMap<>());
+    public <T> ResponseEntity<T> get(String address, String endpoint, Class<T> c) {
+        return get(address, endpoint, new HashMap<>(), new HashMap<>(), c);
     }
 
 

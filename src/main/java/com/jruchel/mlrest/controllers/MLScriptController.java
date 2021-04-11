@@ -37,7 +37,7 @@ public class MLScriptController extends Controller {
         return new ResponseEntity<>(backendService.getAlgorithms(), HttpStatus.OK);
     }
 
-    @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.GET)
+    @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.POST)
     public HttpEntity<String> predictLinearRegression(
             @PathParam(value = "modelName") String modelName,
             @RequestBody MultipartFile data,
@@ -48,7 +48,7 @@ public class MLScriptController extends Controller {
         return new ResponseEntity<>(backendService.predictLinearRegression(model, data, separator, predicting), HttpStatus.OK);
     }
 
-    @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
+    @SecuredMapping(path = "/linear-regression", method = RequestMethod.POST)
     public ResponseEntity<LinearRegressionTrainingResult> linearRegression
             (
                     @RequestBody MultipartFile csv,
@@ -65,7 +65,7 @@ public class MLScriptController extends Controller {
         return new ResponseEntity<>(responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
     }
 
-    @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
+    @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.POST)
     public ResponseEntity<String> knn
             (
                     @RequestBody MultipartFile csv,
