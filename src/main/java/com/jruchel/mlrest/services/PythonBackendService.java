@@ -2,7 +2,6 @@ package com.jruchel.mlrest.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jruchel.mlrest.componets.HttpService;
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
 import lombok.RequiredArgsConstructor;

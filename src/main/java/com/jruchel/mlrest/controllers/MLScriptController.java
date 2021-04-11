@@ -44,13 +44,9 @@ public class MLScriptController extends Controller {
             @RequestBody MultipartFile data,
             @PathParam(value = "separator") String separator,
             @PathParam(value = "predicting") String predicting
-    ) {
+    ) throws IOException, URISyntaxException {
         Model model = modelService.findByUserAndName(userService.loadPrincipalUser(), modelName);
-        try {
-            return backendService.predictLinearRegression(model, data, separator, predicting);
-        } catch (IOException | URISyntaxException e) {
-            return e.toString();
-        }
+        return backendService.predictLinearRegression(model, data, separator, predicting);
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
@@ -62,36 +58,31 @@ public class MLScriptController extends Controller {
                     @PathParam("save") boolean save,
                     @PathParam("savename") String savename
 
-            ) {
-        try {
+            ) throws IOException, URISyntaxException {
+        boolean saveResult = false;
+        User user = userService.loadPrincipalUser();
+        UUID userSecret = user.getSecret();
+        String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
+        if (save) {
+            MLModel mlModel = objectMapper.readValue(response, MLModel.class);
+            if (mlModel.getFile() != null) {
 
-            boolean saveResult = false;
-            User user = userService.loadPrincipalUser();
-            UUID userSecret = user.getSecret();
-            String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
-            if (save) {
-                MLModel mlModel = objectMapper.readValue(response, MLModel.class);
-                if (mlModel.getFile() != null) {
-
-                    String encoded = mlModel.getFile();
-                    encoded = encoded.replace("b'", "").replace("'", "");
-                    Model model = new Model();
-                    model.setName(savename);
-                    model.setSavedModel(encoded);
-                    model.setLastTrainedAccuracy(Double.parseDouble(String.valueOf(mlModel.getAccuracy())));
-                    model.setPredictedAttribute(predicting);
-                    Model savedModel = modelService.save(model);
-                    user.addModel(savedModel);
-                    if (modelService.findByUserAndName(user, savename) != null) {
-                        saveResult = true;
-                    }
-                    response = response.replaceAll("\\\"file\\\":.+\\\".+\\\",", String.format("\"saved\":%s,", saveResult));
+                String encoded = mlModel.getFile();
+                encoded = encoded.replace("b'", "").replace("'", "");
+                Model model = new Model();
+                model.setName(savename);
+                model.setSavedModel(encoded);
+                model.setLastTrainedAccuracy(Double.parseDouble(String.valueOf(mlModel.getAccuracy())));
+                model.setPredictedAttribute(predicting);
+                Model savedModel = modelService.save(model);
+                user.addModel(savedModel);
+                if (modelService.findByUserAndName(user, savename) != null) {
+                    saveResult = true;
                 }
+                response = response.replaceAll("\\\"file\\\":.+\\\".+\\\",", String.format("\"saved\":%s,", saveResult));
             }
-            return response;
-        } catch (Exception e) {
-            return e.getMessage();
         }
+        return response;
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
@@ -103,12 +94,10 @@ public class MLScriptController extends Controller {
              @PathParam("neighbours") int neighbours,
              @PathParam("save") boolean save,
              @PathParam("savename") String savename
-            ) {
-        try {
-            UUID userSecret = userService.loadUserByUsername(principal.getName()).getSecret();
-            return backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString());
-        } catch (IOException | URISyntaxException e) {
-            return e.getMessage();
-        }
+            ) throws IOException, URISyntaxException {
+
+        UUID userSecret = userService.loadUserByUsername(principal.getName()).getSecret();
+        return backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString());
+
     }
 }

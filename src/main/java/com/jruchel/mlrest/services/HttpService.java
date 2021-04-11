@@ -1,4 +1,4 @@
-package com.jruchel.mlrest.componets;
+package com.jruchel.mlrest.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;

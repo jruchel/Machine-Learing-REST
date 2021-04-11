@@ -1,4 +1,4 @@
-package com.jruchel.mlrest.controllers.security;
+package com.jruchel.mlrest.controllers;
 
 import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
