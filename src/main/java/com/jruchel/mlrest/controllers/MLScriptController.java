@@ -8,6 +8,7 @@ import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.ModelService;
 import com.jruchel.mlrest.services.PythonBackendService;
+import com.jruchel.mlrest.services.ResponseHandlerService;
 import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +32,7 @@ public class MLScriptController extends Controller {
     private final PythonBackendService backendService;
     private final UserService userService;
     private final ModelService modelService;
+    private final ResponseHandlerService responseHandler;
     private final ObjectMapper objectMapper;
 
     @SecuredMapping(path = "", method = RequestMethod.GET)
@@ -63,32 +64,22 @@ public class MLScriptController extends Controller {
         User user = userService.loadPrincipalUser();
         UUID userSecret = user.getSecret();
         String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
-        LinearRegressionTrainingResult linearRegressionTrainingResult = objectMapper.readValue(response, LinearRegressionTrainingResult.class);
-        if (save) {
-            if (linearRegressionTrainingResult.getFile() != null) {
-                modelService.save(linearRegressionTrainingResult.toModel(savename, user));
-                if (modelService.findPrincipalModelByName(savename) != null) {
-                    linearRegressionTrainingResult.setFile(savename);
-                } else {
-                    linearRegressionTrainingResult.setFile("not saved");
-                }
-            }
-        }
-        return new ResponseEntity<>(linearRegressionTrainingResult, HttpStatus.OK);
+
+        return new ResponseEntity<>(responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
     public ResponseEntity<String> knn
-            (Principal principal,
-             @RequestBody MultipartFile csv,
-             @PathParam("separator") String separator,
-             @PathParam("predicting") String predicting,
-             @PathParam("neighbours") int neighbours,
-             @PathParam("save") boolean save,
-             @PathParam("savename") String savename
+            (
+                    @RequestBody MultipartFile csv,
+                    @PathParam("separator") String separator,
+                    @PathParam("predicting") String predicting,
+                    @PathParam("neighbours") int neighbours,
+                    @PathParam("save") boolean save,
+                    @PathParam("savename") String savename
             ) throws IOException, URISyntaxException {
 
-        UUID userSecret = userService.loadUserByUsername(principal.getName()).getSecret();
+        UUID userSecret = userService.loadPrincipalUser().getSecret();
         return new ResponseEntity<>(backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString()), HttpStatus.OK);
 
     }
