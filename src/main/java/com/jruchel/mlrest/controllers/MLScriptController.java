@@ -68,7 +68,7 @@ public class MLScriptController extends Controller {
             if (linearRegressionTrainingResult.getFile() != null) {
                 modelService.save(linearRegressionTrainingResult.toModel(savename, user));
                 if (modelService.findPrincipalModelByName(savename) != null) {
-                    linearRegressionTrainingResult.setFile("saved");
+                    linearRegressionTrainingResult.setFile(savename);
                 } else {
                     linearRegressionTrainingResult.setFile("not saved");
                 }

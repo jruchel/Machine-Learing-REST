@@ -19,7 +19,7 @@ public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    @Column(unique = true)
     private String name;
     private String predictedAttribute;
     private double lastTrainedAccuracy;
