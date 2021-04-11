@@ -3,9 +3,7 @@ package com.jruchel.mlrest.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -13,9 +11,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,33 +20,54 @@ public class HttpService {
 
     private final RestTemplate requests;
 
-    public String get(String address, String endpoint, Map<String, String> pathParams, MultipartFile file, String modelFile) throws IOException, URISyntaxException {
-        URL url = constructUrl(address, endpoint, pathParams);
-        if (file != null) {
-            return sendRequestWithFile(url.toString(), file, modelFile);
-        }
-        return requests.getForObject(url.toURI(), String.class);
+    public String get(String address, String endpoint, Map<String, String> headers, Map<String, String> pathParams) {
+        String url = constructUrl(address, endpoint, pathParams);
+        HttpEntity<String> requestEntity = new HttpEntity<>(toHeaders(headers));
+        return requests.exchange(url, HttpMethod.GET, requestEntity, String.class).getBody();
     }
 
-    private String sendRequestWithFile(String url, MultipartFile file, String modelFile) throws IOException {
+    public <T> ResponseEntity<T> postMultipartForm(String address, String endpoint, Map<String, Object> formData, Map<String, String> headersMap, Map<String, String> params, Class<T> c) throws IOException {
+        String url = constructUrl(address, endpoint, params);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        Resource resourceFile = new FileSystemResource(file.getBytes(), file.getOriginalFilename());
-        body.add("data", resourceFile);
-        body.add("modelfile", modelFile);
+        headers.addAll(toHeaders(headersMap));
+
         HttpEntity<MultiValueMap<String, Object>> requestEntity
-                = new HttpEntity<>(body, headers);
+                = new HttpEntity<>(toFormBody(formData), headers);
 
-        return requests.postForEntity(url, requestEntity, String.class).getBody();
+        return requests.postForEntity(url, requestEntity, c);
     }
 
-    public String get(String address, String endpoint) throws IOException, URISyntaxException {
-        return get(address, endpoint, new HashMap<>(), null, null);
+    private MultiValueMap<String, String> toHeaders(Map<String, String> headers) {
+        MultiValueMap<String, String> result = new LinkedMultiValueMap<>();
+
+        for (String key : headers.keySet()) {
+            result.add(key, headers.get(key));
+        }
+        return result;
+    }
+
+    private MultiValueMap<String, Object> toFormBody(Map<String, Object> formData) throws IOException {
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        for (String key : formData.keySet()) {
+            Object value = formData.get(key);
+            if (value instanceof MultipartFile) {
+                MultipartFile file = (MultipartFile) value;
+                Resource resourceFile = new FileSystemResource(file.getBytes(), file.getOriginalFilename());
+                body.add(key, resourceFile);
+            }
+            else body.add(key, formData.get(key));
+
+        }
+        return body;
+    }
+
+    public String get(String address, String endpoint) {
+        return get(address, endpoint, new HashMap<>(), new HashMap<>());
     }
 
 
-    private URL constructUrl(String address, String endpoint, Map<String, String> pathParams) throws MalformedURLException {
+    private String constructUrl(String address, String endpoint, Map<String, String> pathParams) {
         StringBuilder sb = new StringBuilder();
         sb.append(address).append(endpoint);
         if (pathParams.size() > 0) {
@@ -59,9 +75,9 @@ public class HttpService {
             for (String key : pathParams.keySet()) {
                 sb.append(key).append("=").append(pathParams.get(key)).append("&");
             }
-            return new URL(sb.substring(0, sb.length() - 1));
+            return sb.substring(0, sb.length() - 1);
         }
-        return new URL(sb.toString());
+        return sb.toString();
     }
 
     public static class FileSystemResource extends ByteArrayResource {

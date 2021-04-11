@@ -18,7 +18,6 @@ public class LinearRegressionTrainingResult {
     private String file;
     private String predicted;
 
-
     public void setFile(String file) {
         this.file = file.replace("b'", "").replace("'", "");
     }

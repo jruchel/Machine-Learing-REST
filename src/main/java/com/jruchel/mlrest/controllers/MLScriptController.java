@@ -1,6 +1,5 @@
 package com.jruchel.mlrest.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +31,6 @@ public class MLScriptController extends Controller {
     private final UserService userService;
     private final ModelService modelService;
     private final ResponseHandlerService responseHandler;
-    private final ObjectMapper objectMapper;
 
     @SecuredMapping(path = "", method = RequestMethod.GET)
     public ResponseEntity<List<String>> getAlgorithms() {
@@ -46,7 +43,7 @@ public class MLScriptController extends Controller {
             @RequestBody MultipartFile data,
             @PathParam(value = "separator") String separator,
             @PathParam(value = "predicting") String predicting
-    ) throws IOException, URISyntaxException {
+    ) throws IOException {
         Model model = modelService.findPrincipalModelByName(modelName);
         return new ResponseEntity<>(backendService.predictLinearRegression(model, data, separator, predicting), HttpStatus.OK);
     }
@@ -60,10 +57,10 @@ public class MLScriptController extends Controller {
                     @PathParam("save") boolean save,
                     @PathParam("savename") String savename
 
-            ) throws IOException, URISyntaxException {
+            ) throws IOException {
         User user = userService.loadPrincipalUser();
         UUID userSecret = user.getSecret();
-        String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
+        LinearRegressionTrainingResult response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
 
         return new ResponseEntity<>(responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
     }
@@ -77,7 +74,7 @@ public class MLScriptController extends Controller {
                     @PathParam("neighbours") int neighbours,
                     @PathParam("save") boolean save,
                     @PathParam("savename") String savename
-            ) throws IOException, URISyntaxException {
+            ) throws IOException {
 
         UUID userSecret = userService.loadPrincipalUser().getSecret();
         return new ResponseEntity<>(backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString()), HttpStatus.OK);

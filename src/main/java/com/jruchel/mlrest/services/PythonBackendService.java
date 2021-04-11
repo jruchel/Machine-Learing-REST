@@ -4,13 +4,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
+import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,20 +28,23 @@ public class PythonBackendService {
             String json = httpService.get(properties.getBackendAddress(), "/algorithms");
             return objectMapper.readValue(json, new TypeReference<List<String>>() {
             });
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             return new ArrayList<>();
         }
     }
 
-    public String predictLinearRegression(Model model, MultipartFile data, String separator, String predicting) throws IOException, URISyntaxException {
+    public String predictLinearRegression(Model model, MultipartFile data, String separator, String predicting) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("modelfile", model.getSavedModel());
+        formData.put("data", data);
 
-        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s/predict", "linear-regression"), params, data, model.getSavedModel());
+        return httpService.postMultipartForm(properties.getBackendAddress(), "/algorithms/linear-regression/predict", formData, new HashMap<>(), params, String.class).getBody();
     }
 
-    public String knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException, URISyntaxException {
+    public String knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
@@ -46,21 +52,23 @@ public class PythonBackendService {
         params.put("save", String.valueOf(save));
         params.put("savename", savename);
         params.put("usersecret", userSecret);
-        return algorithm("k-nearest-neighbours", csvData, params);
+        return algorithm("k-nearest-neighbours", csvData, params, String.class);
     }
 
-    public String linearRegression(MultipartFile csvData, String separator, String predicting, boolean save, String savename, String userSecret) throws IOException, URISyntaxException {
+    public LinearRegressionTrainingResult linearRegression(MultipartFile csvData, String separator, String predicting, boolean save, String savename, String userSecret) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
         params.put("save", String.valueOf(save));
         params.put("savename", savename);
         params.put("usersecret", userSecret);
-        return algorithm("linear-regression", csvData, params);
+        return algorithm("linear-regression", csvData, params, LinearRegressionTrainingResult.class);
     }
 
-    public String algorithm(String algorithm, MultipartFile csvData, Map<String, String> params) throws IOException, URISyntaxException {
-        return httpService.get(properties.getBackendAddress(), String.format("/algorithms/%s", algorithm), params, csvData, null);
+    public <T> T algorithm(String algorithm, MultipartFile csvData, Map<String, String> params, Class<T> c) throws IOException {
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("trainingData", csvData);
+        return httpService.postMultipartForm(properties.getBackendAddress(), String.format("/algorithms/%s", algorithm), formData, new HashMap<>(), params, c).getBody();
     }
 
 }
