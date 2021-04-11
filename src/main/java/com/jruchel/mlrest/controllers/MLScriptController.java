@@ -3,7 +3,7 @@ package com.jruchel.mlrest.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
-import com.jruchel.mlrest.models.dto.MLModel;
+import com.jruchel.mlrest.models.dto.TrainingResult;
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.ModelService;
@@ -46,12 +46,12 @@ public class MLScriptController extends Controller {
             @PathParam(value = "separator") String separator,
             @PathParam(value = "predicting") String predicting
     ) throws IOException, URISyntaxException {
-        Model model = modelService.findByUserAndName(userService.loadPrincipalUser(), modelName);
+        Model model = modelService.findPrincipalModelByName(modelName);
         return new ResponseEntity<>(backendService.predictLinearRegression(model, data, separator, predicting), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
-    public ResponseEntity<String> linearRegression
+    public ResponseEntity<TrainingResult> linearRegression
             (
                     @RequestBody MultipartFile csv,
                     @PathParam("separator") String separator,
@@ -60,30 +60,21 @@ public class MLScriptController extends Controller {
                     @PathParam("savename") String savename
 
             ) throws IOException, URISyntaxException {
-        boolean saveResult = false;
         User user = userService.loadPrincipalUser();
         UUID userSecret = user.getSecret();
         String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
+        TrainingResult trainingResult = objectMapper.readValue(response, TrainingResult.class);
         if (save) {
-            MLModel mlModel = objectMapper.readValue(response, MLModel.class);
-            if (mlModel.getFile() != null) {
-
-                String encoded = mlModel.getFile();
-                encoded = encoded.replace("b'", "").replace("'", "");
-                Model model = new Model();
-                model.setName(savename);
-                model.setSavedModel(encoded);
-                model.setLastTrainedAccuracy(Double.parseDouble(String.valueOf(mlModel.getAccuracy())));
-                model.setPredictedAttribute(predicting);
-                Model savedModel = modelService.save(model);
-                user.addModel(savedModel);
-                if (modelService.findByUserAndName(user, savename) != null) {
-                    saveResult = true;
+            if (trainingResult.getFile() != null) {
+                modelService.save(trainingResult.toModel(savename, user));
+                if (modelService.findPrincipalModelByName(savename) != null) {
+                    trainingResult.setFile("saved");
+                } else {
+                    trainingResult.setFile("not saved");
                 }
-                response = response.replaceAll("\\\"file\\\":.+\\\".+\\\",", String.format("\"saved\":%s,", saveResult));
             }
         }
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(trainingResult, HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
