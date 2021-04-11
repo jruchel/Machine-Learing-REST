@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrainingResult {
+public class LinearRegressionTrainingResult {
 
     private double accuracy;
     private double intercept;

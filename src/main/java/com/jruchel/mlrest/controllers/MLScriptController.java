@@ -3,7 +3,7 @@ package com.jruchel.mlrest.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
-import com.jruchel.mlrest.models.dto.TrainingResult;
+import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.ModelService;
@@ -51,7 +51,7 @@ public class MLScriptController extends Controller {
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
-    public ResponseEntity<TrainingResult> linearRegression
+    public ResponseEntity<LinearRegressionTrainingResult> linearRegression
             (
                     @RequestBody MultipartFile csv,
                     @PathParam("separator") String separator,
@@ -63,18 +63,18 @@ public class MLScriptController extends Controller {
         User user = userService.loadPrincipalUser();
         UUID userSecret = user.getSecret();
         String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
-        TrainingResult trainingResult = objectMapper.readValue(response, TrainingResult.class);
+        LinearRegressionTrainingResult linearRegressionTrainingResult = objectMapper.readValue(response, LinearRegressionTrainingResult.class);
         if (save) {
-            if (trainingResult.getFile() != null) {
-                modelService.save(trainingResult.toModel(savename, user));
+            if (linearRegressionTrainingResult.getFile() != null) {
+                modelService.save(linearRegressionTrainingResult.toModel(savename, user));
                 if (modelService.findPrincipalModelByName(savename) != null) {
-                    trainingResult.setFile("saved");
+                    linearRegressionTrainingResult.setFile("saved");
                 } else {
-                    trainingResult.setFile("not saved");
+                    linearRegressionTrainingResult.setFile("not saved");
                 }
             }
         }
-        return new ResponseEntity<>(trainingResult, HttpStatus.OK);
+        return new ResponseEntity<>(linearRegressionTrainingResult, HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
