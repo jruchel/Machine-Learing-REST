@@ -39,13 +39,13 @@ public class MLScriptController extends Controller {
     }
 
     @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.GET)
-    public String predictLinearRegression(Principal principal,
-                                          @PathParam(value = "modelName") String modelName,
-                                          @RequestBody MultipartFile data,
-                                          @PathParam(value = "separator") String separator,
-                                          @PathParam(value = "predicting") String predicting
+    public String predictLinearRegression(
+            @PathParam(value = "modelName") String modelName,
+            @RequestBody MultipartFile data,
+            @PathParam(value = "separator") String separator,
+            @PathParam(value = "predicting") String predicting
     ) {
-        Model model = modelService.findByUserAndName(userService.loadPrincipalUser(principal), modelName);
+        Model model = modelService.findByUserAndName(userService.loadPrincipalUser(), modelName);
         try {
             return backendService.predictLinearRegression(model, data, separator, predicting);
         } catch (IOException | URISyntaxException e) {
@@ -56,7 +56,6 @@ public class MLScriptController extends Controller {
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
     public String linearRegression
             (
-//                    Principal principal,
                     @RequestBody MultipartFile csv,
                     @PathParam("separator") String separator,
                     @PathParam("predicting") String predicting,
@@ -66,10 +65,8 @@ public class MLScriptController extends Controller {
             ) {
         try {
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            authentication.getPrincipal();
             boolean saveResult = false;
-            User user = userService.loadUserByUsername("kuba");
+            User user = userService.loadPrincipalUser();
             UUID userSecret = user.getSecret();
             String response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
             if (save) {

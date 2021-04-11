@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.security.Principal;
 
 @RestController
 @CrossOrigin
@@ -21,7 +20,7 @@ public class ModelRepositoryController extends Controller {
     private final UserService userService;
 
     @SecuredMapping(path = "", method = RequestMethod.GET)
-    public Model getModelFile(Principal principal, @PathParam(value = "name") String name) {
-        return modelService.findByUserAndName(userService.loadPrincipalUser(principal), name);
+    public Model getPrincipalModelFile(@PathParam(value = "name") String name) {
+        return modelService.findByUserAndName(userService.loadPrincipalUser(), name);
     }
 }

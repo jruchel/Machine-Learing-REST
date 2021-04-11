@@ -1,13 +1,12 @@
 package com.jruchel.mlrest.config;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Data
-@ConfigurationProperties(prefix = "ml")
+@Component
+@Getter
 public class Properties {
-
+    @Value("${backend-address}")
     private String backendAddress;
-    private String dupa;
-
 }

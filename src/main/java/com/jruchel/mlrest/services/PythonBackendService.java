@@ -6,7 +6,6 @@ import com.jruchel.mlrest.componets.HttpService;
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +15,6 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@EnableConfigurationProperties(Properties.class)
 public class PythonBackendService {
 
     private final HttpService httpService;

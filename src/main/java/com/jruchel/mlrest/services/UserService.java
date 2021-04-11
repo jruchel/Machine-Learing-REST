@@ -6,6 +6,10 @@ import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.core.ApplicationContext;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +42,9 @@ public class UserService implements UserDetailsService {
         return users;
     }
 
-    public User loadPrincipalUser(Principal principal) {
-        return loadUserByUsername("kuba");
+    public User loadPrincipalUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return loadUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
     }
 
     private boolean checkEntityIntegrity(User user) throws EntityIntegrityException {
