@@ -10,8 +10,9 @@ import com.jruchel.mlrest.services.ModelService;
 import com.jruchel.mlrest.services.PythonBackendService;
 import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,23 +35,23 @@ public class MLScriptController extends Controller {
     private final ObjectMapper objectMapper;
 
     @SecuredMapping(path = "", method = RequestMethod.GET)
-    public List<String> getAlgorithms() {
-        return backendService.getAlgorithms();
+    public ResponseEntity<List<String>> getAlgorithms() {
+        return new ResponseEntity<>(backendService.getAlgorithms(), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.GET)
-    public String predictLinearRegression(
+    public HttpEntity<String> predictLinearRegression(
             @PathParam(value = "modelName") String modelName,
             @RequestBody MultipartFile data,
             @PathParam(value = "separator") String separator,
             @PathParam(value = "predicting") String predicting
     ) throws IOException, URISyntaxException {
         Model model = modelService.findByUserAndName(userService.loadPrincipalUser(), modelName);
-        return backendService.predictLinearRegression(model, data, separator, predicting);
+        return new ResponseEntity<>(backendService.predictLinearRegression(model, data, separator, predicting), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.GET)
-    public String linearRegression
+    public ResponseEntity<String> linearRegression
             (
                     @RequestBody MultipartFile csv,
                     @PathParam("separator") String separator,
@@ -82,11 +83,11 @@ public class MLScriptController extends Controller {
                 response = response.replaceAll("\\\"file\\\":.+\\\".+\\\",", String.format("\"saved\":%s,", saveResult));
             }
         }
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.GET)
-    public String knn
+    public ResponseEntity<String> knn
             (Principal principal,
              @RequestBody MultipartFile csv,
              @PathParam("separator") String separator,
@@ -97,7 +98,7 @@ public class MLScriptController extends Controller {
             ) throws IOException, URISyntaxException {
 
         UUID userSecret = userService.loadUserByUsername(principal.getName()).getSecret();
-        return backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString());
+        return new ResponseEntity<>(backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString()), HttpStatus.OK);
 
     }
 }
