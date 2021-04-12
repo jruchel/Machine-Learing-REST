@@ -3,6 +3,7 @@ package com.jruchel.mlrest.controllers;
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
+import com.jruchel.mlrest.models.dto.PredictionResults;
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.ModelService;
@@ -38,7 +39,7 @@ public class MLScriptController extends Controller {
     }
 
     @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.POST)
-    public HttpEntity<String> predictLinearRegression(
+    public HttpEntity<PredictionResults> predictLinearRegression(
             @PathParam(value = "modelName") String modelName,
             @RequestBody MultipartFile data,
             @PathParam(value = "separator") String separator,
