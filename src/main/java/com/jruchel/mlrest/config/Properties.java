@@ -9,4 +9,9 @@ import org.springframework.stereotype.Component;
 public class Properties {
     @Value("${backend-address}")
     private String backendAddress;
+    @Value("${test.username}")
+    private String testUsername;
+    @Value("${test.password}")
+    private String testPassword;
+
 }
