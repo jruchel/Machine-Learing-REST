@@ -2,6 +2,7 @@ package com.jruchel.mlrest.controllers;
 
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
+import com.jruchel.mlrest.models.dto.KNearestNeighboursTrainingResult;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import com.jruchel.mlrest.security.Controller;
@@ -38,15 +39,15 @@ public class MLScriptController extends Controller {
         return new ResponseEntity<>(backendService.getAlgorithms(), HttpStatus.OK);
     }
 
-    @SecuredMapping(path = "/linear-regression/predict", method = RequestMethod.POST, role = "user")
-    public HttpEntity<PredictionResults> predictLinearRegression(
+    @SecuredMapping(path = "/predict", method = RequestMethod.POST, role = "user")
+    public HttpEntity<PredictionResults> predict(
             @PathParam(value = "modelName") String modelName,
             @RequestBody MultipartFile data,
             @PathParam(value = "separator") String separator,
             @PathParam(value = "predicting") String predicting
     ) throws IOException {
         Model model = modelService.findPrincipalModelByName(modelName);
-        return new ResponseEntity<>(backendService.predictLinearRegression(model, data, separator, predicting), HttpStatus.OK);
+        return new ResponseEntity<>(backendService.predict(model, data, separator, predicting), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.POST, role = "user")
@@ -63,11 +64,11 @@ public class MLScriptController extends Controller {
         UUID userSecret = user.getSecret();
         LinearRegressionTrainingResult response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
 
-        return new ResponseEntity<>(responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
+        return new ResponseEntity<>((LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.POST, role = "user")
-    public ResponseEntity<String> knn
+    public ResponseEntity<KNearestNeighboursTrainingResult> knn
             (
                     @RequestBody MultipartFile csv,
                     @PathParam("separator") String separator,
@@ -76,9 +77,10 @@ public class MLScriptController extends Controller {
                     @PathParam("save") boolean save,
                     @PathParam("savename") String savename
             ) throws IOException {
-
+        User user = userService.loadPrincipalUser();
         UUID userSecret = userService.loadPrincipalUser().getSecret();
-        return new ResponseEntity<>(backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString()), HttpStatus.OK);
+        KNearestNeighboursTrainingResult result = backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString());
+        return new ResponseEntity<>((KNearestNeighboursTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(result, save, savename, user), HttpStatus.OK);
 
     }
 }

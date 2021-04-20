@@ -23,6 +23,7 @@ public class Model {
     private String name;
     private String predictedAttribute;
     private double lastTrainedAccuracy;
+    private String algorithm;
     @Lob
     private String savedModel;
 

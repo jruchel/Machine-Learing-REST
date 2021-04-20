@@ -2,6 +2,7 @@ package com.jruchel.mlrest.services;
 
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
+import com.jruchel.mlrest.models.dto.KNearestNeighboursTrainingResult;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class PythonBackendService {
         return list.stream().map(o -> o.toString()).collect(Collectors.toList());
     }
 
-    public PredictionResults predictLinearRegression(Model model, MultipartFile data, String separator, String predicting) throws IOException {
+    public PredictionResults predict(Model model, MultipartFile data, String separator, String predicting) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
@@ -35,10 +36,10 @@ public class PythonBackendService {
         formData.put("modelfile", model.getSavedModel());
         formData.put("data", data);
 
-        return httpService.postMultipartForm(properties.getBackendAddress(), "/algorithms/linear-regression/predict", formData, new HashMap<>(), params, PredictionResults.class).getBody();
+        return httpService.postMultipartForm(properties.getBackendAddress(), "/algorithms/predict", formData, new HashMap<>(), params, PredictionResults.class).getBody();
     }
 
-    public String knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException {
+    public KNearestNeighboursTrainingResult knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
@@ -46,7 +47,7 @@ public class PythonBackendService {
         params.put("save", String.valueOf(save));
         params.put("savename", savename);
         params.put("usersecret", userSecret);
-        return algorithm("k-nearest-neighbours", csvData, params, String.class);
+        return algorithm("k-nearest-neighbours", csvData, params, KNearestNeighboursTrainingResult.class);
     }
 
     public LinearRegressionTrainingResult linearRegression(MultipartFile csvData, String separator, String predicting, boolean save, String savename, String userSecret) throws IOException {

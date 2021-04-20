@@ -2,24 +2,29 @@ package com.jruchel.mlrest.models.dto;
 
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LinearRegressionTrainingResult extends TrainingResult {
-
+public class KNearestNeighboursTrainingResult extends TrainingResult {
     private double accuracy;
-    private double intercept;
-    private List<Double> coefficients;
+    private int neighbours;
     private String file;
     private String predicted;
 
+    @Override
     public void setFile(String file) {
         this.file = file.replace("b'", "").replace("'", "");
+    }
+
+    @Override
+    public String getFile() {
+        return file;
     }
 
     @Override
