@@ -2,7 +2,6 @@ package com.jruchel.mlrest.services;
 
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
-import com.jruchel.mlrest.models.dto.KNearestNeighboursTrainingResult;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +27,10 @@ public class PythonBackendService {
         return list.stream().map(o -> o.toString()).collect(Collectors.toList());
     }
 
-    public PredictionResults predict(Model model, MultipartFile data, String separator, String predicting) throws IOException {
+    public PredictionResults predict(Model model, MultipartFile data, String separator) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
-        params.put("predicting", predicting);
+        params.put("predicting", model.getPredictedAttribute());
         Map<String, Object> formData = new HashMap<>();
         formData.put("modelfile", model.getSavedModel());
         formData.put("data", data);
@@ -39,15 +38,12 @@ public class PythonBackendService {
         return httpService.postMultipartForm(properties.getBackendAddress(), "/algorithms/predict", formData, new HashMap<>(), params, PredictionResults.class).getBody();
     }
 
-    public KNearestNeighboursTrainingResult knn(MultipartFile csvData, String separator, String predicting, int neighbours, boolean save, String savename, String userSecret) throws IOException {
+    public PredictionResults knn(MultipartFile csvData, String separator, String predicting, int neighbors) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
         params.put("predicting", predicting);
-        params.put("neighbours", String.valueOf(neighbours));
-        params.put("save", String.valueOf(save));
-        params.put("savename", savename);
-        params.put("usersecret", userSecret);
-        return algorithm("k-nearest-neighbours", csvData, params, KNearestNeighboursTrainingResult.class);
+        params.put("neighbors", String.valueOf(neighbors));
+        return algorithm("k-nearest-neighbors", csvData, params, PredictionResults.class);
     }
 
     public LinearRegressionTrainingResult linearRegression(MultipartFile csvData, String separator, String predicting, boolean save, String savename, String userSecret) throws IOException {
@@ -62,7 +58,7 @@ public class PythonBackendService {
 
     public <T> T algorithm(String algorithm, MultipartFile csvData, Map<String, String> params, Class<T> c) throws IOException {
         Map<String, Object> formData = new HashMap<>();
-        formData.put("trainingData", csvData);
+        formData.put("data", csvData);
         return httpService.postMultipartForm(properties.getBackendAddress(), String.format("/algorithms/%s", algorithm), formData, new HashMap<>(), params, c).getBody();
     }
 

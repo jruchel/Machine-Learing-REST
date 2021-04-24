@@ -27,8 +27,7 @@ public class SecurityService {
         UserDetails fromDB = userService.loadUserByUsername(username);
         if (fromDB == null) return false;
         if (!fromDB.getUsername().equals(username)) return false;
-        if (!passwordEncoder.matches(password, fromDB.getPassword())) return false;
-        return true;
+        return passwordEncoder.matches(password, fromDB.getPassword());
     }
 
     private boolean checkRoles(User user) {

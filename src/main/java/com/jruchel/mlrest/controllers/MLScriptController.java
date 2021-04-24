@@ -2,7 +2,6 @@ package com.jruchel.mlrest.controllers;
 
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
-import com.jruchel.mlrest.models.dto.KNearestNeighboursTrainingResult;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import com.jruchel.mlrest.security.Controller;
@@ -12,7 +11,6 @@ import com.jruchel.mlrest.services.PythonBackendService;
 import com.jruchel.mlrest.services.ResponseHandlerService;
 import com.jruchel.mlrest.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,20 +38,19 @@ public class MLScriptController extends Controller {
     }
 
     @SecuredMapping(path = "/predict", method = RequestMethod.POST, role = "user")
-    public HttpEntity<PredictionResults> predict(
+    public ResponseEntity<PredictionResults> predict(
             @PathParam(value = "modelName") String modelName,
             @RequestBody MultipartFile data,
-            @PathParam(value = "separator") String separator,
-            @PathParam(value = "predicting") String predicting
+            @PathParam(value = "separator") String separator
     ) throws IOException {
         Model model = modelService.findPrincipalModelByName(modelName);
-        return new ResponseEntity<>(backendService.predict(model, data, separator, predicting), HttpStatus.OK);
+        return new ResponseEntity<>(backendService.predict(model, data, separator), HttpStatus.OK);
     }
 
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.POST, role = "user")
     public ResponseEntity<LinearRegressionTrainingResult> linearRegression
             (
-                    @RequestBody MultipartFile csv,
+                    @RequestBody MultipartFile data,
                     @PathParam("separator") String separator,
                     @PathParam("predicting") String predicting,
                     @PathParam("save") boolean save,
@@ -62,25 +59,20 @@ public class MLScriptController extends Controller {
             ) throws IOException {
         User user = userService.loadPrincipalUser();
         UUID userSecret = user.getSecret();
-        LinearRegressionTrainingResult response = backendService.linearRegression(csv, separator, predicting, save, savename, userSecret.toString());
+        LinearRegressionTrainingResult response = backendService.linearRegression(data, separator, predicting, save, savename, userSecret.toString());
 
         return new ResponseEntity<>((LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
     }
 
-    @SecuredMapping(path = "/k-nearest-neighbours", method = RequestMethod.POST, role = "user")
-    public ResponseEntity<KNearestNeighboursTrainingResult> knn
+    @SecuredMapping(path = "/k-nearest-neighbors", method = RequestMethod.POST, role = "user")
+    public ResponseEntity<PredictionResults> knn
             (
-                    @RequestBody MultipartFile csv,
+                    @RequestBody MultipartFile data,
                     @PathParam("separator") String separator,
                     @PathParam("predicting") String predicting,
-                    @PathParam("neighbours") int neighbours,
-                    @PathParam("save") boolean save,
-                    @PathParam("savename") String savename
+                    @PathParam("neighbors") int neighbors
             ) throws IOException {
-        User user = userService.loadPrincipalUser();
-        UUID userSecret = userService.loadPrincipalUser().getSecret();
-        KNearestNeighboursTrainingResult result = backendService.knn(csv, separator, predicting, neighbours, save, savename, userSecret.toString());
-        return new ResponseEntity<>((KNearestNeighboursTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(result, save, savename, user), HttpStatus.OK);
+        return new ResponseEntity<>(backendService.knn(data, separator, predicting, neighbors), HttpStatus.OK);
 
     }
 }
