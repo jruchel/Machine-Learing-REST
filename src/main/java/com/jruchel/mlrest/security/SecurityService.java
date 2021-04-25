@@ -30,17 +30,14 @@ public class SecurityService {
         return passwordEncoder.matches(password, fromDB.getPassword());
     }
 
-    private boolean checkRoles(User user) {
-        Set<Role> userRoles = user.getRoles();
-        if (userRoles.size() == 0) return false;
-        for (Role role : userRoles) {
-            if (roleService.getRoleByTitle(role.getTitle()) == null) return false;
-        }
-
-        return true;
-    }
-
     private void assignCorrectRoles(User user) {
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            Role userRole = new Role();
+            userRole.setTitle("user");
+            Set<Role> roles = new HashSet<>();
+            roles.add(userRole);
+            user.setRoles(roles);
+        }
         Set<Role> correctRoles = new HashSet<>();
         for (Role r : user.getRoles()) {
             correctRoles.add(roleService.getRoleByTitle(r.getTitle()));
@@ -49,8 +46,8 @@ public class SecurityService {
     }
 
     private boolean validateRegistration(User user) {
-        if (userService.loadUserByUsername(user.getUsername()) != null) return false;
-        return checkRoles(user);
+        return (userService.loadUserByUsername(user.getUsername()) == null);
+
     }
 
     public boolean register(User user) throws EntityIntegrityException {
