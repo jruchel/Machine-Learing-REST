@@ -1,6 +1,7 @@
 package com.jruchel.mlrest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jruchel.mlrest.validation.user.EmailConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,9 +26,14 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "username", unique = true)
+    @NotNull
     private String username;
     @Column(name = "password")
+    @NotNull
     private String password;
+    @Column(name = "email")
+    @EmailConstraint
+    private String email;
     @JsonIgnore
     private UUID secret;
     private boolean locked;

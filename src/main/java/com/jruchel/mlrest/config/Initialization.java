@@ -39,10 +39,11 @@ public class Initialization {
         return role;
     }
 
-    private User createUser(String username, String password, List<Role> roles) throws EntityIntegrityException {
+    private User createUser(String username, String password, String email, List<Role> roles) throws EntityIntegrityException {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
+        user.setEmail(email);
         for (Role r : roles) {
             user.grantRole(r);
         }
@@ -54,7 +55,7 @@ public class Initialization {
     private void initialize() {
         User user = null;
         try {
-            user = createUser("kuba", "admin", createRoles("user"));
+            user = createUser("kuba", "admin", "jruchel@gmail.com", createRoles("user"));
         } catch (EntityIntegrityException e) {
             System.out.printf("User: %s could not be created.%n", user == null ? "null" : user.toString());
         }
