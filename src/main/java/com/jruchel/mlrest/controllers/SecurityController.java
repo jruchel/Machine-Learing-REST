@@ -49,7 +49,7 @@ public class SecurityController extends Controller {
                     @ApiResponse(code = 409, message = "Conflict", response = Boolean.class)
             }
     )
-    @SecuredMapping(path = "/register", method = RequestMethod.GET)
+    @SecuredMapping(path = "/register", method = RequestMethod.POST)
     public ResponseEntity<Boolean> register(@ApiParam(name = "user", value = "User to register, only the username and password are taken into account.", required = true, example = "{\"username\":\"user\", \"password\":\"password\"}") @RequestBody User user) throws EntityIntegrityException {
         user.setRoles(user.getRoles().stream().filter(role -> role.getTitle().equals("user") || role.getTitle().equals("ROLE_USER")).collect(Collectors.toSet()));
         boolean registered = securityService.register(user);
