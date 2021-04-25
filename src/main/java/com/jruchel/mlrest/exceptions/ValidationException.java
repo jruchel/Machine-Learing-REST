@@ -1,4 +1,4 @@
-package com.jruchel.mlrest.validation;
+package com.jruchel.mlrest.exceptions;
 
 public class ValidationException extends Exception {
 

@@ -3,6 +3,7 @@ package com.jruchel.mlrest.validation;
 
 import com.jruchel.mlrest.config.ApplicationContextHolder;
 import com.jruchel.mlrest.config.Properties;
+import com.jruchel.mlrest.exceptions.ValidationException;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 

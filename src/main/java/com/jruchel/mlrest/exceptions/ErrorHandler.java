@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,9 +25,14 @@ public class ErrorHandler {
         return new ResponseEntity<>("Constraint violation, incorrect input data.", RESPONSE_STATUS);
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<String> handleAnyError(Exception ex) {
+    @ExceptionHandler(value = IOException.class)
+    public ResponseEntity<String> IOError(IOException ex) {
         return new ResponseEntity<>(ex.getMessage(), RESPONSE_STATUS);
+    }
+
+    @ExceptionHandler(value = ValidationException.class)
+    public ResponseEntity<String> validationError(ValidationException ex) {
+        return new ResponseEntity<>(String.format("Validation error: \n%s", ex.getMessage()), RESPONSE_STATUS);
     }
 
 }
