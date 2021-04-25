@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.List;
@@ -96,14 +97,14 @@ public class MLScriptController extends Controller {
                     @ApiParam(required = true, name = "savename", value = "Name to save the model as.")
                     @PathParam("savename") String savename
 
-            ) throws IOException {
+            ) throws IOException, MessagingException {
         User user = userService.loadPrincipalUser();
         trainLinearRegression(data, separator, predicting, save, savename, user);
         return new ResponseEntity<>("Training has started, once it is finished, the results will be sent to your email and the model will be saved on your account.", HttpStatus.valueOf(202));
     }
 
     @Async
-    public LinearRegressionTrainingResult trainLinearRegression(MultipartFile data, String separator, String predicting, boolean save, String savename, User user) throws IOException {
+    public LinearRegressionTrainingResult trainLinearRegression(MultipartFile data, String separator, String predicting, boolean save, String savename, User user) throws IOException, MessagingException {
         LinearRegressionTrainingResult response = backendService.linearRegression(data, separator, predicting, save, savename, user.getSecret().toString());
         return (LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user);
     }

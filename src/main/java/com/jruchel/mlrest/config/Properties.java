@@ -20,6 +20,20 @@ public class Properties {
     private String testPassword;
     @Value("${regex.email}")
     private String emailRegex;
+    @Value("${mail.host}")
+    private String mailHost;
+    @Value("${mail.port}")
+    private int mailPort;
+    @Value("${mail.ssl}")
+    private String mailSsl;
+    @Value("${mail.tls}")
+    private String mailTsl;
+    @Value("${mail.user}")
+    private String mailUser;
+    @Value("${mail.password}")
+    private String mailPassword;
+    @Value("${mail.from}")
+    private String mailFrom;
 
     private BuildProperties getBuildProperties() {
         return buildProperties;

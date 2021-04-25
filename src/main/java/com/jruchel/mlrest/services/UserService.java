@@ -2,6 +2,7 @@ package com.jruchel.mlrest.services;
 
 
 import com.jruchel.mlrest.exceptions.EntityIntegrityException;
+import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.Role;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.repositories.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,10 @@ public class UserService implements UserDetailsService {
         if (checkEntityIntegrity(user)) {
             userRepository.save(user);
         }
+    }
+
+    public Set<Model> getUserModels(User user) {
+        return user.getModels();
     }
 
     public List<User> findAll() {
