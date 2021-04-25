@@ -48,7 +48,7 @@ class SecurityControllerTest extends ControllerTest {
     @Test
     @Order(2)
     public void authenticateNonExistentUser() {
-        ResponseEntity<String> response = securityController.authorize(mockUser());
+        ResponseEntity<String> response = securityController.authenticate(mockUser());
         assertEquals(409, response.getStatusCode().value());
     }
 
@@ -65,7 +65,7 @@ class SecurityControllerTest extends ControllerTest {
     @Test
     @Order(4)
     public void authenticateMockUser() {
-        ResponseEntity<String> response = securityController.authorize(mockUser());
+        ResponseEntity<String> response = securityController.authenticate(mockUser());
         assertEquals(response.getStatusCode().value(), 200);
 
         assertTrue(Pattern.matches("token:[a-zA-Z0-9-_]+\\.[a-zA-Z0-9-_]+\\.[a-zA-Z0-9-_]+", response.getBody()));
