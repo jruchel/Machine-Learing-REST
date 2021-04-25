@@ -14,13 +14,13 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @CrossOrigin
@@ -77,13 +77,13 @@ public class MLScriptController extends Controller {
             authorizations = {
                     @Authorization(value = "user")
             },
-            response = LinearRegressionTrainingResult.class)
+            response = String.class)
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Success", response = LinearRegressionTrainingResult.class),
+            @ApiResponse(code = 200, message = "Success", response = String.class),
             @ApiResponse(code = 409, message = "Conflict", response = String.class)
     })
     @SecuredMapping(path = "/linear-regression", method = RequestMethod.POST, role = "user")
-    public ResponseEntity<LinearRegressionTrainingResult> linearRegression
+    public ResponseEntity<String> linearRegression
             (
                     @ApiParam(required = true, name = "data", value = "Data to train on.")
                     @RequestBody MultipartFile data,
@@ -98,10 +98,14 @@ public class MLScriptController extends Controller {
 
             ) throws IOException {
         User user = userService.loadPrincipalUser();
-        UUID userSecret = user.getSecret();
-        LinearRegressionTrainingResult response = backendService.linearRegression(data, separator, predicting, save, savename, userSecret.toString());
+        trainLinearRegression(data, separator, predicting, save, savename, user);
+        return new ResponseEntity<>("Training has started, once it is finished, the results will be sent to your email and the model will be saved on your account.", HttpStatus.valueOf(202));
+    }
 
-        return new ResponseEntity<>((LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user), HttpStatus.OK);
+    @Async
+    public LinearRegressionTrainingResult trainLinearRegression(MultipartFile data, String separator, String predicting, boolean save, String savename, User user) throws IOException {
+        LinearRegressionTrainingResult response = backendService.linearRegression(data, separator, predicting, save, savename, user.getSecret().toString());
+        return (LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user);
     }
 
     @ApiOperation(

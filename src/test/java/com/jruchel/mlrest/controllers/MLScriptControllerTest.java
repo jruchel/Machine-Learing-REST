@@ -1,6 +1,5 @@
 package com.jruchel.mlrest.controllers;
 
-import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -13,7 +12,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class MLScriptControllerTest extends ControllerTest {
@@ -47,19 +47,6 @@ class MLScriptControllerTest extends ControllerTest {
             boolean save,
             String savename) throws IOException, NullPointerException {
 
-        ResponseEntity<LinearRegressionTrainingResult> response =
-                mlScriptController.linearRegression(dataFile, separator, predicting, save, savename);
-        assertEquals(200, response.getStatusCode().value());
-        LinearRegressionTrainingResult trainingResult = response.getBody();
-        assertWithinRange(trainingResult.getAccuracy(), accuracy - 5, accuracy + 5);
-        assertWithinRange(trainingResult.getIntercept(), intercept - 1, intercept + 1);
-        assertEquals(coeffsSize, trainingResult.getCoefficients().size());
-        if (save) {
-            assertEquals("", trainingResult.getFile());
-        } else {
-            assertNotEquals("", trainingResult.getFile());
-        }
-        assertEquals(predicting, trainingResult.getPredicted());
 
     }
 
