@@ -2,7 +2,6 @@ package com.jruchel.mlrest.controllers;
 
 import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.User;
-import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
@@ -14,7 +13,6 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -99,15 +97,10 @@ public class MLScriptController extends Controller {
 
             ) throws IOException, MessagingException {
         User user = userService.loadPrincipalUser();
-        trainLinearRegression(data, separator, predicting, save, savename, user);
+        backendService.trainLinearRegression(data, separator, predicting, save, savename, user);
         return new ResponseEntity<>("Training has started, once it is finished, the results will be sent to your email and the model will be saved on your account.", HttpStatus.valueOf(202));
     }
 
-    @Async
-    public LinearRegressionTrainingResult trainLinearRegression(MultipartFile data, String separator, String predicting, boolean save, String savename, User user) throws IOException, MessagingException {
-        LinearRegressionTrainingResult response = backendService.linearRegression(data, separator, predicting, save, savename, user.getSecret().toString());
-        return (LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user);
-    }
 
     @ApiOperation(
             value = "Classify data using k nearest neighbors algorithm",

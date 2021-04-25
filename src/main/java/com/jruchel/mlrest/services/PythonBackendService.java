@@ -2,12 +2,15 @@ package com.jruchel.mlrest.services;
 
 import com.jruchel.mlrest.config.Properties;
 import com.jruchel.mlrest.models.Model;
+import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,10 +24,17 @@ public class PythonBackendService {
 
     private final HttpService httpService;
     private final Properties properties;
+    private final ResponseHandlerService responseHandler;
 
     public List<String> getAlgorithms() {
         List<Object> list = httpService.get(properties.getBackendAddress(), "/algorithms", ArrayList.class).getBody();
         return list.stream().map(o -> o.toString()).collect(Collectors.toList());
+    }
+
+    @Async
+    public LinearRegressionTrainingResult trainLinearRegression(MultipartFile data, String separator, String predicting, boolean save, String savename, User user) throws IOException, MessagingException {
+        LinearRegressionTrainingResult response = linearRegression(data, separator, predicting, save, savename, user.getSecret().toString());
+        return (LinearRegressionTrainingResult) responseHandler.handleLinearRegressionTrainingResponse(response, save, savename, user);
     }
 
     public PredictionResults predict(Model model, MultipartFile data, String separator) throws IOException {
