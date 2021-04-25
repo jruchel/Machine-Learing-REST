@@ -48,7 +48,7 @@ public class MLScriptController extends Controller {
 
     @ApiOperation(
             value = "Use an already trained model to make new predictions",
-            notes = "Finds a principal model by name and makes predictions based on the given csv data.",
+            notes = "Make predictions for the given model owned by the currently authenticated user.",
             authorizations = {
                     @Authorization(value = "user")
             },
