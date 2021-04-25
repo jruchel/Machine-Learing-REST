@@ -1,5 +1,7 @@
 package com.jruchel.mlrest.documentation;
 
+import com.jruchel.mlrest.config.Properties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -14,12 +16,15 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @Configuration
 @EnableSwagger2
+@RequiredArgsConstructor
 public class SwaggerConfig {
+
+    private final Properties properties;
 
     @Bean
     public Docket taskApi() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("task-api")
+                .groupName("ml-api")
                 .useDefaultResponseMessages(true)
                 .apiInfo(apiInfo())
                 .select()
@@ -36,7 +41,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("Machine learning API")
                 .description("An API that allows for easy access to various machine learning algorithms. Simply upload your data and fulfill all necessary parameters, everything else is already set up and ready to be used.")
-                .version("0.1")
+                .version(properties.version())
                 .build();
     }
 }
