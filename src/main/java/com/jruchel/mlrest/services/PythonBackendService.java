@@ -5,7 +5,6 @@ import com.jruchel.mlrest.models.Model;
 import com.jruchel.mlrest.models.dto.LinearRegressionTrainingResult;
 import com.jruchel.mlrest.models.dto.PredictionResults;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +46,6 @@ public class PythonBackendService {
         return algorithm("k-nearest-neighbors", csvData, params, PredictionResults.class);
     }
 
-    @Async
     public LinearRegressionTrainingResult linearRegression(MultipartFile csvData, String separator, String predicting, boolean save, String savename, String userSecret) throws IOException {
         Map<String, String> params = new HashMap<>();
         params.put("separator", separator);
