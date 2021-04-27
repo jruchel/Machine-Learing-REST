@@ -93,9 +93,6 @@ public class HttpService {
             return fileName;
         }
 
-        public void setFilename(String fileName) {
-            this.fileName = fileName;
-        }
     }
 
 }

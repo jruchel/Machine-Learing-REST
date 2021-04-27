@@ -72,9 +72,7 @@ public abstract class MySecurityConfig extends WebSecurityConfigurerAdapter {
 
     protected Set<String> getRoles(List<Endpoint> endpoints) {
         Set<String> endpointList = new HashSet<>();
-        endpoints.forEach(endpoint -> {
-            endpointList.addAll(Arrays.asList(endpoint.getRole()));
-        });
+        endpoints.forEach(endpoint -> endpointList.addAll(Arrays.asList(endpoint.getRole())));
         return endpointList;
     }
 

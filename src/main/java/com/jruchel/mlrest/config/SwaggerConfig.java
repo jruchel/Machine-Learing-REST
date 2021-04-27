@@ -1,6 +1,5 @@
-package com.jruchel.mlrest.documentation;
+package com.jruchel.mlrest.config;
 
-import com.jruchel.mlrest.config.Properties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +40,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("Machine learning API")
                 .description("An API that allows for easy access to various machine learning algorithms. Simply upload your data and fulfill all necessary parameters, everything else is already set up and ready to be used.")
-                .version(properties.version())
+                .version(properties.getVersion())
                 .build();
     }
 }

@@ -57,7 +57,7 @@ public class Initialization {
         try {
             user = createUser("kuba", "admin", "jruchel@gmail.com", createRoles("user"));
         } catch (EntityIntegrityException e) {
-            System.out.printf("User: %s could not be created.%n", user == null ? "null" : user.toString());
+            System.out.printf("User: %s could not be created.%n", "null");
         }
     }
 }

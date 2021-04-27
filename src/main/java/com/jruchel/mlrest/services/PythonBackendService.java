@@ -28,7 +28,7 @@ public class PythonBackendService {
 
     public List<String> getAlgorithms() {
         List<Object> list = httpService.get(properties.getBackendAddress(), "/algorithms", ArrayList.class).getBody();
-        return list.stream().map(o -> o.toString()).collect(Collectors.toList());
+        return list.stream().map(Object::toString).collect(Collectors.toList());
     }
 
     @Async

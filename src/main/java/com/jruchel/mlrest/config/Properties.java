@@ -39,7 +39,7 @@ public class Properties {
         return buildProperties;
     }
 
-    public String version() {
+    public String getVersion() {
         return getBuildProperties().getVersion();
     }
 }
