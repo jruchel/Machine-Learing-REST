@@ -7,10 +7,10 @@ import com.jruchel.mlrest.security.Controller;
 import com.jruchel.mlrest.security.SecuredMapping;
 import com.jruchel.mlrest.services.ModelService;
 import com.jruchel.mlrest.services.PythonBackendService;
-import com.jruchel.mlrest.services.ResponseHandlerService;
 import com.jruchel.mlrest.services.UserService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +30,6 @@ public class MLScriptController extends Controller {
     private final PythonBackendService backendService;
     private final UserService userService;
     private final ModelService modelService;
-    private final ResponseHandlerService responseHandler;
 
     @ApiOperation(value = "See what algorithms are available",
             notes = "Returns a list of available machine learning algorithms",
@@ -97,6 +96,8 @@ public class MLScriptController extends Controller {
 
             ) throws IOException, MessagingException {
         User user = userService.loadPrincipalUser();
+        if (save && user.getModels().stream().filter(model -> model.getName().equals(savename)).findFirst().orElse(null) != null)
+            throw new DataIntegrityViolationException(String.format("Duplicate model name for model '%s' and user '%s'", savename, user.getUsername()));
         backendService.trainLinearRegression(data, separator, predicting, save, savename, user);
         return new ResponseEntity<>("Training has started, once it is finished, the results will be sent to your email and the model will be saved on your account.", HttpStatus.valueOf(202));
     }

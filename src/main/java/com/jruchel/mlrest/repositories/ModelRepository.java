@@ -10,4 +10,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface ModelRepository extends JpaRepository<Model, Integer> {
     Model findByOwnerAndName(User owner, String name);
+
 }
