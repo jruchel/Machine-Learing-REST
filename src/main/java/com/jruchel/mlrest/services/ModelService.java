@@ -21,10 +21,9 @@ public class ModelService {
     }
 
     public Model delete(Model model) throws ValidationException {
-        Model deletedModel = modelRepository.findById(model.getId()).orElse(null);
-        if (deletedModel == null)
-            throw new ValidationException(String.format("Model '%s' does not exist for user '%s'", model.getName(), model.getOwner()));
-        modelRepository.deleteById(model.getId());
+        Model deletedModel = modelRepository.findById(model.getId()).orElseThrow(
+                () -> new ValidationException(String.format("Model '%s' does not exist for user '%s'", model.getName(), model.getOwner())));
+        modelRepository.delete(model);
         return deletedModel;
     }
 

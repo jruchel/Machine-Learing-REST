@@ -3,7 +3,6 @@ package com.jruchel.mlrest.services;
 import com.jruchel.mlrest.models.User;
 import com.jruchel.mlrest.models.dto.TrainingResult;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -30,8 +29,6 @@ public class ResponseHandlerService {
         }
         return response;
     }
-
-
 
     protected void sendNotificationEmail(User user, String saveName, boolean success) throws MessagingException {
         if (success)
