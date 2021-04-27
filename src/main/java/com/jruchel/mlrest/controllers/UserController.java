@@ -77,7 +77,7 @@ public class UserController {
             }
     )
     @ApiResponses({@ApiResponse(code = 200, message = "Success", response = Boolean.class)})
-    @SecuredMapping(path = "/models/model", method = RequestMethod.DELETE, role = "user")
+    @SecuredMapping(path = "/models/model", method = RequestMethod.GET, role = "user")
     public ResponseEntity<Model> getUserModelByName(@ApiParam(name = "modelName", value = "Name of the model to delete.",
             required = true, example = "students-linear-regression")
                                                     @PathParam("modelName") String modelName) throws ValidationException {
