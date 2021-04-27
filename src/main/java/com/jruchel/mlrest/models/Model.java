@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.*;
 
 @Entity
@@ -30,4 +29,10 @@ public class Model {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     private User owner;
+
+    @PreRemove
+    protected void preRemove() {
+        owner.getModels().remove(this);
+        this.owner = null;
+    }
 }
