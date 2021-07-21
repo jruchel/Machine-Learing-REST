@@ -60,7 +60,7 @@ public class MLScriptController extends Controller {
     public ResponseEntity<PredictionResults> predict(
             @ApiParam(required = true, name = "modelName", value = "Name of a trained model", type = "String", example = "linear-regression-stock-values")
             @PathParam(value = "modelName") String modelName,
-            @ApiParam(required = true, name = "data", value = "Data to base the predictions off")
+            @ApiParam(required = true, name = "data", value = "Data to base the predictions off of")
             @RequestBody MultipartFile data,
             @ApiParam(required = true, name = "separator", value = "The separator sign that the csv data uses", example = ",")
             @PathParam(value = "separator") String separator
